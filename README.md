@@ -324,7 +324,7 @@ POST,PUT,DELETE,... запросы
 
 В папке [`src/routes`](src/routes) создаем свой файл `[название].ts`\
 Смело вставляем этот отрезок:
-```bash
+```typescript
 import { Router, Response, Request, NextFunction } from 'express';
 import jwt from '../middleware/jwt';
 import NoteController from '../controllers/NoteController';
