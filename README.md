@@ -320,19 +320,33 @@ $ typeorm entity:create -n User
 Пишем по примеру, опять же их 3.
 #### Добавление новых ENDPOINTS(конечных точек) API
 Приложение написано по принципу REST API или подобии на него\
-POST,PUT,DELETE,... запросы
+POST,PUT,DELETE,... запросы.\
+Все это удобно делать с [Postman](https://www.getpostman.com/). Так как у нас нет UI.
+
+Попробуй отправить POST запрос на адрес http://localhost:4000/api/v1/user/signup\
+вот такой json и посмотри что получишь в ответ(это регестрация):
+```json
+{
+  "firstName": "Lada",
+  "lastName": "Kalina",
+  "username": "newUser",
+  "email": "test@example.com",
+  "password": "qwerty1234"
+}
+```
 
 В папке [`src/routes`](src/routes) создаем свой файл `[название].ts`\
 Смело вставляем этот отрезок:
 ```typescript
 import { Router, Response, Request, NextFunction } from 'express';
 import jwt from '../middleware/jwt';
-import NoteController from '../controllers/NoteController';
 import config from '../config';
+// Подключаем наш контроллер
+import NoteController from '../controllers/NoteController';
 
 const route = Router();
 
-// Создаем свой контроллер подключаем
+// Создаем екземпляр контроллера
 const noteCtrl = new NoteController();
 
 const jwtMiddleware = jwt({ secret: config.get('jwt.secret') });
@@ -341,7 +355,7 @@ export default (app: Router) => {
 
     app.use('/api/v1/[НАЗВАНИЕ ВАШЕГО ЕНДПОИНТА]', route);  
 
-    // Далле пишем все сюда
+    // Далее пишем все сюда
 
 };
 ```
@@ -362,7 +376,6 @@ route.post(
       noteCtrl.create(req, res);
     });
 ```
-Запрос типа **POST** и нужно слать такого типа на адрес\
-`'/'` означает адрес `http://localhost:4000/api/v1/node/`\
-было бы `'/test'` тогда `http://localhost:4000/api/v1/node/test`\
+Запрос типа **POST** и нужно слать такого типа на адрес.\
+`'/'` означает адрес `http://localhost:4000/api/v1/node/`, было бы `'/test'` тогда `http://localhost:4000/api/v1/node/test`.\
 `req` и `res` это объекты запроса и ответа соответсвенно.
