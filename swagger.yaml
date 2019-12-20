@@ -1,0 +1,548 @@
+openapi: 3.0.0
+info:
+  description: Express-ts-typeorm-api API Documentation
+  version: 1.0.0
+  title: Express-ts-typeorm-api API
+paths:
+  /api/v1/user/signup:
+    post:
+      tags:
+      - User
+      summary: "Signup a new User"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - firstName
+                - lastName
+                - username
+                - email
+                - password
+              properties:
+                firstName:
+                  type: string
+                  minLength: 1
+                  maxLength: 25
+                lastName:
+                  type: string
+                  minLength: 1
+                  maxLength: 25
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 32
+                  format: username
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 32
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    example: 1
+                  message:
+                    type: string
+                    example: 'SUCCESS'
+        400:
+          $ref: '#/components/responses/400'
+  /api/v1/user/authenticate:
+    post:
+      tags:
+        - User
+      summary: 'User authorization'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 32
+                  format: username
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 32
+      responses:
+        200:
+          $ref: '#/components/responses/tokens'
+        400:
+          $ref: '#/components/responses/400'
+  /api/v1/user/refreshAccessToken:
+    post:
+      tags:
+        - User
+      summary: 'Refresh user token'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - username
+                - refreshToken
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 32
+                  format: username
+                refreshToken:
+                  type: string
+                  format: refreshToken
+      responses:
+        200:
+          $ref: '#/components/responses/tokens'
+        400:
+          $ref: '#/components/responses/400'
+  /api/v1/user/invalidateAllRefreshTokens:
+    post:
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      summary: 'Invalidate all refresh tokens'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - username
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 32
+                  format: username
+      responses:
+        200:
+          $ref: '#/components/responses/success'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/v1/user/invalidateRefreshToken:
+    post:
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      summary: 'Invalidate refresh token'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - username
+                - refreshToken
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 32
+                  format: username
+                refreshToken:
+                  type: string
+                  format: refreshToken
+      responses:
+        200:
+          $ref: '#/components/responses/success'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/v1/user/forgot:
+    post:
+      tags:
+        - User
+      summary: 'forgot password'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passwordResetToken:
+                    type: string
+                    format: passwordResetToken
+                    example: 8-m9VA2RCcJG_fF72L4ydrt8MGRGmCD58gE5isDp6luT0nVCdPPa8-7GUn78Dfq7
+        400:
+          $ref: '#/components/responses/400'
+  /api/v1/user/checkPasswordResetToken:
+    post:
+      tags:
+        - User
+      summary: 'Check password reset token'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - passwordResetToken
+              properties:
+                email:
+                  type: string
+                  format: email
+                passwordResetToken:
+                  type: string
+                  format: passwordResetToken
+      responses:
+        200:
+          $ref: '#/components/responses/success'
+        400:
+          $ref: '#/components/responses/400'
+  /api/v1/user/resetPassword:
+    post:
+      tags:
+        - User
+      summary: 'Reset user password'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - passwordResetToken
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 32
+                passwordResetToken:
+                  type: string
+                  format: passwordResetToken
+      responses:
+        200:
+          $ref: '#/components/responses/success'
+        400:
+          $ref: '#/components/responses/400'
+  /api/v1/user/private:
+    post:
+      tags:
+        - User
+      summary: 'Get authenticated user info'
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'User data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userInfo'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/v1/note/:
+    post:
+      tags:
+        - Note
+      summary: 'Create a new note'
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - content
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'SUCCESS'
+                    default: 'SUCCESS'
+                  id:
+                    type: integer
+                    format: int64
+                    example: 1
+        400:
+          $ref: '#/components/responses/400'
+    get:
+      tags:
+        - Note
+      summary: 'Get a list of notes'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: order
+          in: query
+          required: true
+          description: 'Order type of note list'
+          schema:
+            type: string
+            enum:
+              - 'ASC'
+              - 'DESC'
+        - name: page
+          in: query
+          required: true
+          description: 'Number of page'
+          schema:
+            type: integer
+            format: int64
+            default: 0
+        - name: limit
+          in: query
+          required: true
+          description: 'Number of notes on one page'
+          schema:
+            type: integer
+            format: int64
+            default: 10
+        - name: sort
+          in: query
+          description: 'Sort by keyword'
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/note'
+        400:
+          $ref: '#/components/responses/400'
+  /api/v1/notes/{id}:
+    get:
+      tags:
+        - Note
+      summary: 'Show some note by id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 'Note Id'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/note'
+        400:
+          $ref: '#/components/responses/400'
+    put:
+      tags:
+        - Note
+      summary: 'Update Note'
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: 'Note Id'
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          $ref: '#/components/responses/success'
+        400:
+          $ref: '#/components/responses/400'
+    delete:
+      tags:
+        - Note
+      summary: 'Delete Note'
+      security:
+        - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: 'Note Id'
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          $ref: '#/components/responses/success'
+        400:
+          $ref: '#/components/responses/400'
+components:
+  #-------------------------------
+  # Reusable schemas (data models)
+  #-------------------------------
+  schemas:
+    note:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+          example: 'Bacon'
+        content:
+          type: string
+          example: 'We need to transmit the redundant AGP microchip!'
+        createdAt:
+          type: string
+          format: 'date-time'
+        updatedAt:
+          type: string
+          format: 'date-time'
+    userInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        token:
+          type: string
+          example: QCn9yAV
+        username:
+          type: string
+          minLength: 3
+          maxLength: 32
+          format: username
+          example: testUsername
+        email:
+          type: string
+          format: email
+          example: testUsername@example.com
+        isAdmin:
+          type: boolean
+          example: false
+  #-------------------------------
+  # Security scheme definitions (see Authentication)
+  #-------------------------------
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  #-------------------------------
+  # Reusable responses, such as 401 Unauthorized or 400 Bad Request
+  #-------------------------------
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+          examples:
+            TOKEN_NOT_PROVIDED:
+              $ref: '#/components/examples/TOKEN_NOT_PROVIDED'
+            TOKEN_EXPIRED:
+              $ref: '#/components/examples/TOKEN_EXPIRED'
+    tokens:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              accessToken:
+                type: string
+                example: ewoiYWxnIjogIkhTMjU2iiwKInR5cCI6ICJKV1QiCn0K.ewoiSXNzIjogImZlcm5hbmRvIiwKIkV4cCI6IDE1NTA5NDY2ODksCiJBZG1pbiI6IGZhbHNlCn0K.TseARzVBAtDbU8f3TEiRgsUoKYaW2SbhCWB0QlKpdp8
+              refreshToken:
+                type: string
+                format: refreshToken
+                example: 8-m9VA2RCcJG_fF72L4ydrt8MGRGmCD58gE5isDp6luT0nVCdPPa8-7GUn78Dfq7
+    success:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'SUCCESS'
+    400:
+      description: Invalid data was received
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: INVALID_DATA
+  #-------------------------------
+  # Reusable responses, such as 401 Unauthorized or 400 Bad Request
+  #-------------------------------
+  examples:
+    TOKEN_NOT_PROVIDED:
+      value:
+        error: 'TOKEN_NOT_PROVIDED'
+    TOKEN_EXPIRED:
+      value:
+        error: 'TOKEN_EXPIRED'
