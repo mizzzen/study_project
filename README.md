@@ -323,7 +323,7 @@ $ typeorm entity:create -n User
 POST,PUT,DELETE,... запросы.\
 Все это удобно делать с [Postman](https://www.getpostman.com/). Так как у нас нет UI.
 
-Попробуй отправить POST запрос на адрес http://localhost:4000/api/v1/user/signup\
+Попробуй отправить POST запрос на адрес http://localhost:4000/api/v1/user/signup
 вот такой json и посмотри что получишь в ответ(это регестрация):
 ```json
 {
